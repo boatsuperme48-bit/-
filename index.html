@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>หมูกระทะป้อนรัก</title>
+<link href="https://fonts.googleapis.com/css2?family=Itim&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff0d6;--ink:#4a2a17;--card:#fffaf0;--wood:#9a6238;--wood2:#6e4426;--red:#c4452f;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#2b1a10;--ink:#ffe9cc;--card:#3d2616}}
+:root[data-theme="dark"]{--bg:#2b1a10;--ink:#ffe9cc;--card:#3d2616}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:'Itim','Mali','Sarabun',system-ui,sans-serif;-webkit-user-select:none;user-select:none}
+#app{max-width:520px;margin:auto;height:100%;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.hud{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--card);border-bottom:4px solid var(--wood)}
+.stat{flex:1;text-align:center;line-height:1}
+.stat small{display:block;font-size:.72rem;opacity:.75;margin-bottom:2px}
+.stat b{font-size:2rem;color:var(--red);font-variant-numeric:tabular-nums}
+#stg{font-size:.9rem;color:var(--ink)}
+.btn{font:inherit;border:0;border-radius:999px;padding:.55em 1.2em;background:var(--red);color:#fff;font-size:1.05rem;cursor:pointer;box-shadow:0 4px 0 #8c2c1d;touch-action:manipulation}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #8c2c1d}
+.scene{flex:1;position:relative;display:flex;flex-direction:column;min-height:0}
+#char{flex:0 0 47%;display:flex;justify-content:center;align-items:flex-end;padding-top:78px;box-sizing:border-box;position:relative;z-index:1;min-height:0}
+#char svg{height:100%;max-width:100%;overflow:visible}
+.bubble{position:absolute;top:6px;left:50%;transform:translateX(-50%) scale(0);width:max-content;max-width:92%;background:#fff;color:#4a2a17;border:3px solid #4a2a17;border-radius:18px;padding:6px 14px;font-size:1rem;text-align:center;z-index:5;transition:transform .2s}
+.bubble.show{transform:translateX(-50%) scale(1)}
+.table{flex:1;margin-top:-5%;background:linear-gradient(var(--wood),var(--wood2));border-radius:30px 30px 0 0;position:relative;z-index:2;display:flex;align-items:center;justify-content:center;box-shadow:0 -6px 0 rgba(0,0,0,.18)}
+.grill{width:74%;aspect-ratio:1.45;border-radius:50%;background:radial-gradient(circle,#ff9a3c 0,#e0561a 14%,#3a3a3a 48%,#222 100%);border:9px solid #8a8a8a;display:grid;grid-template-columns:repeat(3,1fr);place-items:center;padding:11%;box-sizing:border-box}
+.pork{font-size:clamp(1.9rem,9vw,2.7rem);background:none;border:0;cursor:pointer;padding:0;line-height:1;transition:scale .2s;animation:sz 1.3s infinite;touch-action:manipulation}
+.pork.gone{scale:0;pointer-events:none}
+.pork:active{scale:.85}
+.pork{position:relative}
+.b1{filter:sepia(1) brightness(.6)}
+.b2{filter:brightness(.3) contrast(1.3)}
+.c1{filter:sepia(.6) saturate(1.4) brightness(.95)}
+.pork{transition:scale .2s,filter .6s}
+.pork.b2::after{content:'💨';position:absolute;top:-12px;right:-6px;font-size:1.1rem;filter:none;animation:sm 1s infinite;pointer-events:none}
+@keyframes sm{50%{transform:translateY(-6px);opacity:.4}}
+.deco{position:absolute;font-size:1.7rem;pointer-events:none}
+@keyframes sz{50%{transform:translateY(-3px) rotate(4deg)}}
+.fly{position:fixed;font-size:2.2rem;z-index:20;pointer-events:none;transform:translate(-50%,-50%)}
+svg *{transform-box:fill-box;transform-origin:center}
+.belly,.face,.ck,.hand{transition:transform .6s cubic-bezier(.3,1.5,.5,1)}
+.hand{opacity:0;transition:opacity .2s,transform .6s,fill .8s}
+.face,.hand{fill:var(--skin,#f6c89f)}
+.face{transition:transform .6s cubic-bezier(.3,1.5,.5,1),fill .8s}
+.pat .hand,.shock .hand,.tired .hand{opacity:1}
+.eye{transition:transform .2s}
+.mouth{transform:scaleY(.3);transition:transform .15s}
+.open .mouth{transform:scale(1.15,1.3)}
+.chew .mouth{animation:ch .22s 3}
+.chew .hd{animation:nod .22s 3}
+.shock .mouth{transform:scale(1.6)}
+.shock .eye,.stare .eye{transform:scale(1.4)}
+.tired .eye{transform:scaleY(.2)}
+.shock .hd{animation:shk .15s infinite}
+.tired .hd{animation:drp 1.3s ease-in-out infinite}
+.bb{transform-origin:50% 100%}
+.bb.bounce{animation:sq .45s}
+.pat .bb{animation:sq .32s 3}
+.roll{animation:roll 3.2s ease-in-out}
+.trash{position:absolute;right:1%;top:40%;font-size:1.9rem;background:none;border:0;padding:2px;cursor:pointer;touch-action:manipulation;transition:scale .15s;z-index:3}
+.trash:active{scale:.85}
+.trash.no{animation:shk .25s 2}
+#npc{position:absolute;right:2%;top:90px;font-size:3.2rem;opacity:0;pointer-events:none;z-index:4;white-space:nowrap}
+#npc.in{animation:npc 2s ease-in-out forwards}
+@keyframes npc{0%{opacity:1;transform:translateX(120%)}25%,70%{opacity:1;transform:translateX(0)}100%{opacity:0;transform:translateX(120%)}}
+.slapped .hd{animation:slp .6s 2}
+.slapped .eye{transform:scaleY(.2)}
+@keyframes slp{20%{transform:rotate(-22deg) translateX(-12px)}60%{transform:rotate(8deg)}}
+.xx{opacity:0}
+.dead .xx{opacity:1}
+.dead .eye{opacity:0}
+.dead .mouth{transform:scale(.8,1)}
+.dead .hd{transform:rotate(-14deg) translateY(12px)}
+.ghost{position:absolute;top:80px;right:18%;font-size:2.4rem;opacity:0;pointer-events:none;z-index:3}
+.ghost.up{animation:gh 2.4s forwards}
+@keyframes gh{0%{opacity:0;transform:translateY(40px)}30%{opacity:1}100%{opacity:0;transform:translateY(-60px)}}
+@keyframes ch{50%{transform:scaleY(1)}}
+@keyframes nod{50%{transform:translateY(3px)}}
+@keyframes shk{50%{transform:translateX(4px)}}
+@keyframes drp{50%{transform:rotate(7deg) translateY(6px)}}
+@keyframes sq{0%{transform:scale(1)}30%{transform:scale(1.1,.88)}60%{transform:scale(.95,1.07)}100%{transform:scale(1)}}
+@keyframes roll{0%{transform:translate(0,0) rotate(0)}35%{transform:translate(120%,50%) rotate(720deg)}45%,65%{transform:translate(170%,90%) rotate(720deg);opacity:0}100%{transform:translate(0,0) rotate(0);opacity:1}}
+.overlay{position:absolute;inset:0;background:rgba(40,20,10,.8);display:flex;align-items:center;justify-content:center;z-index:10;padding:16px}
+.overlay[hidden]{display:none}
+.card{background:var(--card);border:5px solid var(--wood);border-radius:30px;padding:22px 20px;text-align:center;max-width:380px;width:100%;max-height:100%;overflow:auto}
+h1{margin:0 0 6px;font-size:2.6rem;color:var(--red);line-height:1.1}
+.card p{margin:8px 0 18px}
+.big{font-size:1.3rem;padding:.6em 1.6em}
+.row{display:flex;justify-content:space-around;margin:10px 0}
+.row div{line-height:1.2}.row b{display:block;font-size:1.5rem;color:var(--red)}
+#rc svg{height:150px}
+#rm{font-size:1.1rem;margin:10px 0 16px}
+@media (prefers-reduced-motion:reduce){.pork{animation:none}}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="hud">
+    <div class="stat"><small>🥓 คำที่ป้อน</small><b id="bt">0</b></div>
+    <div class="stat"><small>⏱ เวลา</small><b id="tm">00:00</b><span id="stg"></span></div>
+    <button class="btn" id="stop">หยุดป้อน</button>
+  </header>
+  <main class="scene">
+    <div class="bubble" id="bub"></div>
+    <div id="char">
+      <span class="ghost" id="gh">👻</span><span id="npc"></span>
+      <svg viewBox="0 0 300 280" role="img" aria-label="เพื่อนที่กำลังหิว">
+        <g class="bb">
+          <ellipse class="belly" cx="150" cy="235" rx="62" ry="50" fill="#d9503c"/>
+          <circle class="hand hl" cx="100" cy="228" r="17" fill="#f6c89f"/>
+          <circle class="hand hr" cx="200" cy="228" r="17" fill="#f6c89f"/>
+        </g>
+        <g class="hd">
+          <ellipse cx="150" cy="62" rx="62" ry="40" fill="#3b2418"/>
+          <circle class="face" cx="150" cy="115" r="60" fill="#f6c89f"/>
+          <circle class="ck" cx="106" cy="136" r="19" fill="#f4a58a" opacity=".85"/>
+          <circle class="ck" cx="194" cy="136" r="19" fill="#f4a58a" opacity=".85"/>
+          <g class="eye"><circle cx="126" cy="104" r="10" fill="#fff"/><circle cx="127" cy="106" r="5.5" fill="#222"/></g>
+          <g class="eye"><circle cx="174" cy="104" r="10" fill="#fff"/><circle cx="173" cy="106" r="5.5" fill="#222"/></g>
+          <ellipse class="mouth" cx="150" cy="140" rx="16" ry="12" fill="#7a1f1a"/>
+          <path class="xx" d="M117 95l18 18m0-18l-18 18M165 95l18 18m0-18l-18 18" stroke="#222" stroke-width="5" stroke-linecap="round" fill="none"/>
+        </g>
+      </svg>
+    </div>
+    <div class="table">
+      <span class="deco" style="left:5%;top:8%">🥬🥕</span>
+      <span class="deco" style="right:5%;top:8%">🥣</span>
+      <span class="deco" style="left:6%;bottom:5%">🥢</span>
+      <span class="deco" style="right:6%;bottom:5%">🌶️</span>
+      <button class="trash" id="trash" aria-label="ถังขยะ">🗑️</button>
+      <div class="grill" id="grill"></div>
+    </div>
+  </main>
+  <section class="overlay" id="start">
+    <div class="card">
+      <div style="font-size:3rem">🥓🔥</div>
+      <h1>หมูกระทะป้อนรัก</h1>
+      <p>เพื่อนหิวมาก แตะหมูบนเตาเพื่อป้อนเขาไปเรื่อย ๆ แล้วดูว่าเขาจะกลมได้ขนาดไหน แต่ระวังหมูดิบสีแดงกับหมูไหม้! กินครบ 3 ชิ้นไม่รอดนะ ปล่อยให้ไหม้ทั้งโต๊ะจะโดนตบ ส่วนถังขยะไว้แอบทิ้งหมูไหม้ได้ แต่ระวังเจ้าของร้านจับได้</p>
+      <button class="btn big" data-go>เริ่มป้อน!</button>
+    </div>
+  </section>
+  <section class="overlay" id="res" hidden>
+    <div class="card">
+      <h1 id="rh" style="font-size:2rem">สรุปผลการป้อน</h1>
+      <div id="rc"></div>
+      <div class="row"><div>ป้อนไปทั้งหมด<b id="rb"></b>คำ</div><div>ใช้เวลา<b id="rt"></b></div></div>
+      <div>ร่างสุดท้าย: <b id="rs"></b></div>
+      <p id="rm"></p>
+      <button class="btn big" data-go>ป้อนใหม่อีกรอบ</button>
+    </div>
+  </section>
+</div>
+<script>
+const $=s=>document.querySelector(s);
+const sv=$('#char svg'),chw=$('#char'),bub=$('#bub'),grill=$('#grill');
+const STAGES=['ปกติ หิวโซ','แก้มเริ่มกลม','พุงเริ่มโต','อวบอ้วนสุด ๆ','กลมเวอร์วัง'];
+const PTS=[[0,0],[10,.15],[25,.35],[50,.6],[100,.85],[200,1],[300,1.1]];
+const MS=[
+  {at:100,c:'shock',d:2800,t:'มึงจะป้อนกูไปถึงไหน!'},
+  {at:150,c:'tired',d:3200,t:'กูเริ่มไม่แน่ใจแล้วว่ามากินหมูกระทะหรือมาทำงาน'},
+  {at:200,c:'shock',d:3200,roll:1,t:'พอก่อนนนนน! กูไม่ไหวแล้วโว้ย!'},
+  {at:300,c:'stare',d:3200,t:'นี่มึงไม่มีเพื่อนให้ไปป้อนแล้วใช่ไหม'}];
+const M=[
+  [0,1e9,(n,t)=>`คุณว่างมากเลยนะเนี่ย เพราะใช้เวลาป้อนไปตั้ง ${t}`],
+  [0,1e9,n=>`คุณป้อนหมูไปทั้งหมด ${n} คำ`],
+  [25,1e9,()=>'คุณป้อนจนเขาจำหน้าตัวเองไม่ได้แล้ว'],
+  [50,1e9,()=>'จากคนหิว ๆ สู่หมูกระทะหนึ่งเตาเคลื่อนที่'],
+  [100,1e9,()=>'คุณไม่ได้แค่ป้อนหมู คุณกำลังสร้างตำนาน'],
+  [100,1e9,()=>'อีกนิดเดียวต้องสั่งเก้าอี้เสริมแล้วนะ'],
+  [0,1e9,()=>'คนปกติเขากินหมูกระทะ แต่นี่คุณเลือกทำงานเป็นคนป้อน'],
+  [0,1e9,()=>'ขอบคุณที่เสียเวลาอันมีค่าให้กับหมูย่างบนหน้าจอ'],
+  [0,9,n=>`ป้อนแค่ ${n} คำเองเหรอ? เขายังหิวอยู่เลยนะ`],
+  [200,1e9,n=>`${n} คำ! ร้านหมูกระทะควรจ้างคุณเป็นพนักงานประจำ`],
+  [200,1e9,n=>`ป้อนไป ${n} คำ จนหมูบนเตายังสงสาร`]];
+const DM=[n=>`คุณป้อนหมูไม่ปลอดภัยจนเพื่อนสิ้นลมที่คำที่ ${n}`,()=>'สาเหตุการเสียชีวิต: ได้รับหมูดิบหรือไหม้เกินขนาด',()=>'เตาไม่ผิด หมูไม่ผิด คนป้อนนี่แหละที่ผิด',()=>'งานศพไม่ต้องจัดหมูกระทะนะ เขาเข็ดแล้ว',()=>'เขาจากไปพร้อมรอยยิ้ม และท้องไส้ปั่นป่วนเต็มพุง'];
+const DT={raw:'อ๊อก... กูบอกแล้วว่ามันดิบ...',burnt:'อ๊อก... กูบอกแล้วว่ามันไหม้...',slap:'โอ๊ย... หัวกู...',owner:'ทำไมกูต้องรับกรรมแทน...'};
+const DX={slap:[n=>`ปล่อยหมูไหม้ทั้งโต๊ะจนโดนตบหัวครบสามที เขาไปสบายแล้วที่คำที่ ${n}`,()=>'สาเหตุการเสียชีวิต: โดนตบหัวเพราะความเปลืองหมู',()=>'หมูหายหมดโต๊ะ แม่ค้าไม่ยกโทษให้',()=>'ตบสามทีจากแม่ค้า แรงกว่าหมูไหม้อีก'],owner:[()=>'แอบทิ้งหมูครบสามครั้ง เจ้าของร้านจับได้แล้วกระทืบเพื่อนคุณซะแล้ว',()=>'สาเหตุการเสียชีวิต: โดนเจ้าของร้านกระทืบเพราะแอบทิ้งอาหาร',()=>'กล้องวงจรปิดมีจริงนะ เจ้าของร้านเห็นหมดแล้ว',()=>'ถังขยะเป็นพยาน เจ้าของร้านเป็นศาล เพื่อนคุณเป็นจำเลย']};
+function pickD(n,c){const q=(DX[c]||DM).filter(x=>x!==lastD);lastD=q[Math.floor(Math.random()*q.length)];return lastD(n)}
+let state='idle',bites=0,burns=0,slaps=0,discards=0,lastD=null,t0=0,endMs=0,busy=false,locked=false,reacting=false,bonus=0,fired=new Set(),queue=[],timers=[],tk=0,last=null;
+const later=(f,ms)=>timers.push(setTimeout(f,ms));
+const stage=b=>b<10?0:b<25?1:b<50?2:b<100?3:4;
+function g(b){
+  for(let i=1;i<PTS.length;i++){const[a,x]=PTS[i-1],[c,y]=PTS[i];if(b<=c)return x+(y-x)*(b-a)/(c-a)}
+  return 1.1+Math.min((b-300)*.0004,.15);
+}
+const pad=n=>String(n).padStart(2,'0');
+const elapsed=()=>(state==='playing'?Date.now():endMs)-t0;
+const fmt=ms=>{const s=Math.floor(ms/1000);return pad(Math.floor(s/60))+':'+pad(s%60)};
+function grow(){
+  const t=Math.min(g(bites)+bonus,1.4),rx=62*(1+1.4*t),off=rx*.75-50;
+  $('#char .belly').style.transform=`scale(${1+1.4*t},${1+.9*t})`;
+  sv.querySelector('.face').style.transform=`scale(${1+.2*t})`;
+  sv.querySelectorAll('.ck').forEach(e=>e.style.transform=`scale(${1+.9*t})`);
+  sv.querySelector('.hl').style.transform=`translateX(${-off}px)`;
+  sv.querySelector('.hr').style.transform=`translateX(${off}px)`;
+}
+function hud(){$('#bt').textContent=bites;$('#stg').textContent=STAGES[stage(bites)]+(slaps?` 💢${slaps}/3`:'')+(discards?` 🗑️${discards}/3`:'')+(burns?` ☠️${burns}/3`:'')}
+function respawn(b){b._t=Date.now();b.classList.remove('gone','c1','b1','b2');b.classList.add('r0')}
+function cameo(e){const n=$('#npc');n.textContent=e;n.classList.remove('in');void n.offsetWidth;n.classList.add('in')}
+function slap(){
+  slaps++;hud();
+  grill.querySelectorAll('.pork').forEach(b=>{b.classList.add('gone');later(()=>respawn(b),1500)});
+  if(slaps>=3){finish('slap');return}
+  queue.push({c:'slapped',d:2400,npc:'👵🖐️',t:slaps===1?'👵 เพี๊ยะ! ปล่อยให้ไหม้ทั้งโต๊ะ เปลืองหมูรู้ไหม!':'👵 เพี๊ยะ!! บอกแล้วว่าอย่าให้เปลือง!'});
+  next();
+}
+function toss(b){
+  const r=b.getBoundingClientRect(),t=$('#trash').getBoundingClientRect();
+  const f=document.createElement('span');f.className='fly b2';f.textContent='🥓';
+  f.style.left=r.left+r.width/2+'px';f.style.top=r.top+r.height/2+'px';document.body.append(f);
+  f.animate([{transform:'translate(-50%,-50%) rotate(0)'},{transform:`translate(calc(-50% + ${t.left+t.width/2-r.left-r.width/2}px),calc(-50% + ${t.top+t.height/2-r.top-r.height/2}px)) rotate(200deg) scale(.4)`}],{duration:380,fill:'forwards'});
+  later(()=>f.remove(),380);
+}
+function trashIt(){
+  if(state!=='playing'||locked)return;
+  const tr=$('#trash');
+  const bs=[...grill.querySelectorAll('.pork:not(.gone)')].filter(b=>Date.now()-b._t>11000).sort((a,b)=>a._t-b._t);
+  if(!bs.length){tr.classList.remove('no');void tr.offsetWidth;tr.classList.add('no');return}
+  const b=bs[0];toss(b);b.classList.add('gone');later(()=>respawn(b),1000);
+  discards++;hud();
+  if(discards>=3){finish('owner');return}
+  queue.push({c:'sneak',d:1600,t:discards===1?'🤫 แอบทิ้ง... อย่าให้เจ้าของร้านเห็นนะ (1/3)':'🤫 แอบทิ้งอีกแล้ว... เริ่มมีคนมอง (2/3)'});
+  next();
+}
+function tick(){
+  $('#tm').textContent=fmt(elapsed());
+  if(state==='playing')grill.querySelectorAll('.pork:not(.gone)').forEach(b=>{const a=Date.now()-b._t;b.classList.toggle('r0',a<2500);b.classList.toggle('c1',a>=2500&&a<=7000);b.classList.toggle('b1',a>7000&&a<=11000);b.classList.toggle('b2',a>11000);if(a>17000){b.classList.add('gone');later(()=>respawn(b),1000)}});
+  if(state==='playing'&&[...grill.children].every(b=>!b.classList.contains('gone')&&Date.now()-b._t>11000))slap();
+  if(state==='playing'&&!reacting&&!locked&&bites>=10&&Math.random()<.04){
+    const c=bites>=50&&Math.random()<.4?'tired':'pat';
+    sv.classList.add(c);later(()=>sv.classList.remove(c),1300);
+  }
+}
+function startGame(){
+  timers.forEach(clearTimeout);timers=[];clearInterval(tk);
+  document.querySelectorAll('.fly').forEach(e=>e.remove());
+  sv.setAttribute('class','');chw.classList.remove('roll');bub.classList.remove('show');
+  bites=0;burns=0;slaps=0;discards=0;bonus=0;busy=locked=reacting=false;fired=new Set();queue=[];
+  $('#npc').classList.remove('in');
+  sv.style.removeProperty('--skin');$('#gh').classList.remove('up');
+  grill.querySelectorAll('.pork').forEach(p=>respawn(p));
+  $('#start').hidden=true;$('#res').hidden=true;
+  state='playing';t0=Date.now();hud();grow();tick();
+  tk=setInterval(tick,200);
+}
+function feed(b){
+  if(state!=='playing'||busy||locked||b.classList.contains('gone'))return;
+  const age=Date.now()-b._t,bad=age<2500?'raw':age>11000?'burnt':0;
+  busy=true;b.classList.add('gone');sv.classList.add('open');
+  const r=b.getBoundingClientRect(),m=sv.querySelector('.mouth').getBoundingClientRect();
+  const dx=m.left+m.width/2-(r.left+r.width/2),dy=m.top+m.height/2-(r.top+r.height/2);
+  const f=document.createElement('span');f.className='fly '+(age<2500?'r0':age<=7000?'c1':age<=11000?'b1':'b2');f.textContent='🥓';
+  f.style.left=r.left+r.width/2+'px';f.style.top=r.top+r.height/2+'px';
+  document.body.append(f);
+  f.animate([{transform:'translate(-50%,-50%) scale(1)'},{transform:`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px)) scale(.55) rotate(25deg)`}],{duration:360,easing:'ease-in',fill:'forwards'});
+  later(()=>{f.remove();bite(bad)},360);
+  later(()=>respawn(b),1000);
+}
+function bite(bad){
+  if(state!=='playing')return;
+  bites++;busy=false;hud();grow();
+  sv.classList.remove('open','chew');void sv.getBoundingClientRect();sv.classList.add('chew');
+  const bb=sv.querySelector('.bb');bb.classList.remove('bounce');void bb.getBoundingClientRect();bb.classList.add('bounce');
+  later(()=>sv.classList.remove('chew'),700);
+  MS.forEach(m=>{if(bites>=m.at&&!fired.has(m.at)){fired.add(m.at);queue.push(m)}});
+  if(bad){
+    burns++;hud();
+    sv.style.setProperty('--skin',['#f6c89f','#c9d98a','#86c554','#9fb89a'][burns]);
+    if(burns>=3){finish(bad);return}
+    queue.push({c:'tired',d:2400,t:bad==='raw'?(burns===1?'อี๊! หมูยังดิบอยู่! เริ่มมึนแล้ว...':'ท้องไส้ปั่นป่วน... อย่าป้อนดิบอีกนะ!'):(burns===1?'อี๋! หมูไหม้! เริ่มมึนแล้ว...':'ท้องไส้ปั่นป่วน... อย่าป้อนไหม้อีกนะ!')});
+  }
+  next();
+}
+function next(){
+  if(reacting||!queue.length||state!=='playing')return;
+  const m=queue.shift();reacting=true;
+  sv.classList.add(m.c);bub.textContent=m.t;bub.classList.add('show');
+  if(m.npc)cameo(m.npc);
+  if(m.roll){locked=true;chw.classList.add('roll')}
+  later(()=>{
+    sv.classList.remove(m.c);bub.classList.remove('show');
+    if(m.roll){chw.classList.remove('roll');locked=false;bonus+=.1;grow()}
+    reacting=false;next();
+  },m.d);
+}
+function pick(n,t){
+  let p=M.filter(x=>n>=x[0]&&n<=x[1]);
+  if(n>=100&&Math.random()<.7)p=p.filter(x=>x[0]>=100);
+  const q=p.filter(x=>x!==last);if(q.length)p=q;
+  last=p[Math.floor(Math.random()*p.length)];
+  return last[2](n,t);
+}
+function finish(died){
+  if(state!=='playing')return;
+  state='finished';endMs=Date.now();clearInterval(tk);
+  timers.forEach(clearTimeout);timers=[];
+  document.querySelectorAll('.fly').forEach(e=>e.remove());
+  sv.setAttribute('class','');chw.classList.remove('roll');bub.classList.remove('show');
+  busy=locked=reacting=false;queue=[];
+  if(died){sv.setAttribute('class','dead');$('#gh').classList.add('up');bub.textContent=DT[died];if(died==='slap'||died==='owner')cameo(died==='slap'?'👵🖐️':'😡🦶');bub.classList.add('show')}
+  $('#tm').textContent=fmt(elapsed());
+  const s=Math.floor((endMs-t0)/1000),mi=Math.floor(s/60),ts=(mi?mi+' นาที ':'')+(s%60)+' วินาที';
+  $('#rb').textContent=bites;$('#rt').textContent=ts;
+  $('#rs').textContent=STAGES[stage(bites)]+(died?' (สิ้นลม 💀)':'');
+  $('#rc').innerHTML=sv.outerHTML;
+  $('#rh').textContent=died?'จบเกม 💀':'สรุปผลการป้อน';
+  $('#rm').textContent=died?pickD(bites,died):pick(bites,ts);
+  const show=()=>{$('#res').hidden=false};
+  if(died)later(show,2400);else show();
+}
+for(let i=0;i<6;i++){
+  const b=document.createElement('button');
+  b.className='pork';b.textContent='🥓';b.setAttribute('aria-label','หมูย่าง');
+  b.style.animationDelay=(i*.22)+'s';b.onclick=()=>feed(b);grill.append(b);
+}
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=startGame);
+$('#stop').onclick=()=>finish();$('#trash').onclick=trashIt;
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)tick()});
+grow();hud();
+</script>
+</body>
+</html>
